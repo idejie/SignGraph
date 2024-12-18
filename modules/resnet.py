@@ -152,13 +152,16 @@ class ResNet(nn.Module):
 def resnet18(**kwargs):
     """Constructs a ResNet-18 based model.
     """
+    
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     checkpoint = model_zoo.load_url(model_urls['resnet18'])
     layer_name = list(checkpoint.keys())
     for ln in layer_name:
         if 'conv' in ln or 'downsample.0.weight' in ln:
             checkpoint[ln] = checkpoint[ln].unsqueeze(2)
-    model.load_state_dict(checkpoint, strict=False)
+    mesg = model.load_state_dict(checkpoint, strict=False)
+    # print(mesg)
+    # import pdb;pdb.set_trace()
     return model
 
 

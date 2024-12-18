@@ -37,11 +37,12 @@ def seq_train(loader, model, optimizer, device, epoch_idx, recoder):
             else:
                 loss = model.criterion_calculation(ret_dict, label, label_lgt)
 
-        if np.isinf(loss.item()) or np.isnan(loss.item()):
-            print(f'loss is {loss.item()}')
+        if isinstance(loss,int)or np.isinf(loss.item()) or np.isnan(loss.item()):
+            print(f'loss is {loss}')
             # print(str(data[1])+'  frames', str(data[3])+'  glosses')
             continue
         scaler.scale(loss).backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         scaler.step(optimizer.optimizer)
         scaler.update() 
         if len(device.gpu_list)>1:

@@ -43,6 +43,7 @@ class SLRModel(nn.Module):
         self.num_classes = num_classes
         self.loss_weights = loss_weights
         self.conv2d = getattr(resnet, c2d_type)()
+        
         self.conv2d.fc = Identity()
 
         self.conv1d = TemporalConv(input_size=512,
@@ -110,21 +111,36 @@ class SLRModel(nn.Module):
         for k, weight in self.loss_weights.items():
             if k == 'ConvCTC':
                 loss+=0
-                pred = ret_dict["conv_logits"].log_softmax(-1)
+                pred = (ret_dict["conv_logits"]+ 1e-8).log_softmax(-1)
                 label = label.int().to(pred.device)
                 label_l = label_lgt.int().to(pred.device)
                 pred_l = ret_dict["feat_len"].int().to(pred.device)
-                loss += weight * self.loss['CTCLoss'](pred,label,pred_l,label_l).mean()
+                l = weight * self.loss['CTCLoss'](pred,label,pred_l,label_l).mean()
+                if not torch.isnan(l) and not torch.isinf(l):
+                    loss +=l
+                else:
+                    loss +=l
+                    print(f'conv ctc loss is {l}')
             elif k == 'SeqCTC':
-                pred = ret_dict["sequence_logits"].log_softmax(-1)
+                pred = (ret_dict["sequence_logits"]+ 1e-8).log_softmax(-1)
                 label = label.int().to(pred.device)
                 label_l = label_lgt.int().to(pred.device)
                 pred_l = ret_dict["feat_len"].int().to(pred.device)
-                loss += weight * self.loss['CTCLoss'](pred,label,pred_l,label_l).mean()
+                l= weight * self.loss['CTCLoss'](pred,label,pred_l,label_l).mean()
+                if not torch.isnan(l) and not torch.isinf(l):
+                    loss +=l
+                else:
+                    loss +=l
+                    print(f'seq ctc loss is {l}')
             elif k == 'Dist':
-                loss += weight * self.loss['distillation'](ret_dict["conv_logits"],
+                l= weight * self.loss['distillation'](ret_dict["conv_logits"],
                                                            ret_dict["sequence_logits"].detach(),
                                                            use_blank=False)
+                if not torch.isnan(l) and not torch.isinf(l):
+                    loss +=l
+                else:
+                    loss +=l
+                    print(f'distillation loss is {l}')
         return loss
 
     def criterion_init(self):
