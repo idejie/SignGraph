@@ -32,6 +32,22 @@ class Optimizer(object):
                 lr=base_lr,
                 weight_decay=self.optim_dict['weight_decay']
             )
+        elif self.optim_dict["optimizer"] == 'AdamW':
+            parameters = []
+            base_lr = self.optim_dict['learning_rate'].pop('base_lr')
+            for n, p in model.named_children():
+                lr_ = base_lr
+                for m, lr in self.optim_dict['learning_rate'].items():
+                    if m in n:
+                        lr_ = lr
+                print('learning rate {}={}'.format(n, lr_))
+                parameters.append({'params': p.parameters(), 'lr': lr_})
+            self.optimizer = optim.AdamW(
+                model.parameters(),
+                # parameters,
+                lr=base_lr,
+                weight_decay=self.optim_dict['weight_decay']
+            )
         else:
             raise ValueError()
         self.scheduler = self.define_lr_scheduler(self.optimizer, self.optim_dict['step'])
@@ -44,7 +60,7 @@ class Optimizer(object):
                 eta_min=self.optim_dict['start_epoch'],
                 T_max=self.optim_dict['num_epoch'],
             )
-        if self.optim_dict["optimizer"] in ['SGD', 'Adam']:
+        if self.optim_dict["optimizer"] in ['SGD', 'Adam', 'AdamW']:
             lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=0.2)
             return lr_scheduler
         else:

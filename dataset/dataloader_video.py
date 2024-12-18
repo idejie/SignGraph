@@ -66,7 +66,7 @@ class BaseFeeder(data.Dataset):
             img_folder = os.path.join(self.prefix, "features/fullFrame-210x260px/" + fi['folder'])
 
         elif self.dataset == 'CSL-Daily':
-            img_folder = os.path.join(self.prefix, "sentence/frames_512x512/" + fi['folder'])
+            img_folder = os.path.join(self.prefix, fi['folder'])
         img_list = sorted(glob.glob(img_folder))
         img_list = img_list[int(torch.randint(0, self.frame_interval, [1]))::self.frame_interval]
         label_list = []

@@ -38,8 +38,8 @@ def seq_train(loader, model, optimizer, device, epoch_idx, recoder):
                 loss = model.criterion_calculation(ret_dict, label, label_lgt)
 
         if np.isinf(loss.item()) or np.isnan(loss.item()):
-            print('loss is nan')
-            print(str(data[1])+'  frames', str(data[3])+'  glosses')
+            print(f'loss is {loss.item()}')
+            # print(str(data[1])+'  frames', str(data[3])+'  glosses')
             continue
         scaler.scale(loss).backward()
         scaler.step(optimizer.optimizer)

@@ -109,13 +109,18 @@ class SLRModel(nn.Module):
         loss = 0
         for k, weight in self.loss_weights.items():
             if k == 'ConvCTC':
-                loss += weight * self.loss['CTCLoss'](ret_dict["conv_logits"].log_softmax(-1),
-                                                      label.cpu().int(), ret_dict["feat_len"].cpu().int(),
-                                                      label_lgt.cpu().int()).mean()
+                loss+=0
+                pred = ret_dict["conv_logits"].log_softmax(-1)
+                label = label.int().to(pred.device)
+                label_l = label_lgt.int().to(pred.device)
+                pred_l = ret_dict["feat_len"].int().to(pred.device)
+                loss += weight * self.loss['CTCLoss'](pred,label,pred_l,label_l).mean()
             elif k == 'SeqCTC':
-                loss += weight * self.loss['CTCLoss'](ret_dict["sequence_logits"].log_softmax(-1),
-                                                      label.cpu().int(), ret_dict["feat_len"].cpu().int(),
-                                                      label_lgt.cpu().int()).mean()
+                pred = ret_dict["sequence_logits"].log_softmax(-1)
+                label = label.int().to(pred.device)
+                label_l = label_lgt.int().to(pred.device)
+                pred_l = ret_dict["feat_len"].int().to(pred.device)
+                loss += weight * self.loss['CTCLoss'](pred,label,pred_l,label_l).mean()
             elif k == 'Dist':
                 loss += weight * self.loss['distillation'](ret_dict["conv_logits"],
                                                            ret_dict["sequence_logits"].detach(),
@@ -123,6 +128,6 @@ class SLRModel(nn.Module):
         return loss
 
     def criterion_init(self):
-        self.loss['CTCLoss'] = torch.nn.CTCLoss(reduction='none', zero_infinity=False)
+        self.loss['CTCLoss'] = torch.nn.CTCLoss(reduction='none', zero_infinity=True)
         self.loss['distillation'] = SeqKD(T=8)
         return self.loss

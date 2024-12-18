@@ -1,6 +1,6 @@
 import os
-
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 import pdb
 import sys
 import cv2
@@ -31,7 +31,7 @@ class Processor():
         shutil.copy2('./modules/tconv.py', self.arg.work_dir)
         shutil.copy2('./modules/resnet.py', self.arg.work_dir)
         shutil.copy2('./modules/gcn_lib/temgraph.py', self.arg.work_dir)
-        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.enable = False
         if type(self.arg.device) is not int:
             init_distributed_mode(self.arg)
         self.recoder = utils.Recorder(self.arg.work_dir, self.arg.print_log, self.arg.log_interval)

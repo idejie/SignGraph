@@ -3,21 +3,15 @@ An implementation of the paper: SignGraph: A Sign Sequence is Worth Graphs of No
 
 ## Prerequisites
 
-- This project is implemented in Pytorch (>1.8). Thus please install Pytorch first.
+```bash
+conda create -n sign python=3.12
+conda install pytorch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 pytorch-cuda=12.1 torchtext -c pytorch -c nvidia
+pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.5.0+cu121.html
+git clone --recursive https://github.com/WayenVan/ctcdecode.git
+cd ctcdecode&& pip install -e .
+cd.. && pip install -r requirements.txt
+```
 
-- ctcdecode==0.4 [[parlance/ctcdecode]](https://github.com/parlance/ctcdecode)，for beam search decode.
-
-- For these who failed install ctcdecode (and it always does), you can download [ctcdecode here](https://drive.google.com/file/d/1LjbJz60GzT4qK6WW59SIB1Zi6Sy84wOS/view?usp=sharing), unzip it, and try    
-`cd ctcdecode` and `pip install .`
-
-- Pealse follow [this link](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) to install pytorch geometric
-
-- You can install other required modules by conducting 
-   `pip install -r requirements.txt`
-
- 
-
- 
 
 ## Data Preparation
  
@@ -27,20 +21,9 @@ An implementation of the paper: SignGraph: A Sign Sequence is Worth Graphs of No
 
 3. CSL dataset： Request the CSL Dataset from this website [[download link]](https://ustc-slr.github.io/openresources/cslr-dataset-2015/index.html)
 
- 
-Download datasets and extract them, no further data preprocessing needed. 
+Download datasets and extract them to `data`, no further data preprocessing needed. 
 
-## Weights  
-
-We make some imporvments of our code, and provide newest checkpoionts and better performance.
-
-|Dataset | Backbone | Dev WER | Del / Ins | Test WER  | Del / Ins | Pretrained model                                            |
-| --------| -------- | ---------- | ----------- | ----------- | -----------| --- |
-|Phoenix14T | SignGraph |  17.00|4.99/2.32| 19.44| 5.14/3.38|[[Google Drive]](https://drive.google.com/drive/folders/1FVvbXV7f2-5lJhVlCm-bqzyZ55C1LQ-g?usp=sharing) |
-|Phoenix14 |SignGraph|17.13|6.00/2.17| 18.17|5.65/2.23|[[Google Drive]](https://drive.google.com/drive/folders/1O5JBkmnu2TO8Domzd60tqql8l1zNCzHc?usp=sharing) |
-|CSL-Daily |SignGraph|26.38|9.92/2.62| 25.84|9.39/2.58|[[Google Drive]](https://drive.google.com/drive/folders/1t09Ixpiujw6WJrkSF8gwexvKJie4RGsh?usp=sharing) |
-
-
+## Evaluation
 
 ​To evaluate the pretrained model, choose the dataset from phoenix2014/phoenix2014-T/CSL/CSL-Daily in line 3 in ./config/baseline.yaml first, and run the command below：   
 `python main.py --device your_device --load-weights path_to_weight.pt --phase test`

@@ -1,2 +1,8 @@
 *.pkl
-/weight
+weight
+*.pyc
+*/__*
+__pycache__
+data
+*.swp
+work_dir

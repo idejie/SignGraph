@@ -1,12 +1,13 @@
 feeder: dataset.dataloader_video.BaseFeeder
 phase: train
-dataset: phoenix2014-T
+dataset: CSL-Daily
+#phoenix2014-T
 #CSL-Daily
 # dataset: phoenix14-si5
 
-work_dir: ./work_dirt/
-batch_size: 4
-random_seed: 0 
+work_dir: ./work_dir/
+batch_size: 2
+random_seed: 42
 test_batch_size: 4
 num_worker: 20
 device: 0
@@ -22,9 +23,9 @@ loss_weights:
 load_weights:  False
 load_checkpoints:  False
 optimizer_args:
-  optimizer: Adam
+  optimizer: AdamW
   learning_rate:
-    base_lr: 0.0001 
+    base_lr: 0.000001 
   step: [20, 30, 35]
   learning_ratio: 1
   scheduler: ScheaL #consine
