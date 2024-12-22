@@ -29,22 +29,24 @@ def seq_train(loader, model, optimizer, device, epoch_idx, recoder):
         label = device.data_to_device(data[2])
         label_lgt = device.data_to_device(data[3])
         optimizer.zero_grad()
-        with autocast():
+        # with autocast():
 
-            ret_dict = model(vid, vid_lgt, label=label, label_lgt=label_lgt)
-            if len(device.gpu_list)>1:
-                loss = model.module.criterion_calculation(ret_dict, label, label_lgt)
-            else:
-                loss = model.criterion_calculation(ret_dict, label, label_lgt)
+        ret_dict = model(vid, vid_lgt, label=label, label_lgt=label_lgt)
+        if len(device.gpu_list)>1:
+            loss = model.module.criterion_calculation(ret_dict, label, label_lgt)
+        else:
+            loss = model.criterion_calculation(ret_dict, label, label_lgt)
 
         if isinstance(loss,int)or np.isinf(loss.item()) or np.isnan(loss.item()):
             print(f'loss is {loss}')
             # print(str(data[1])+'  frames', str(data[3])+'  glosses')
             continue
-        scaler.scale(loss).backward()
+        loss.div_(len(loader))
+        optimizer.step()
+        # scaler.scale(loss).backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-        scaler.step(optimizer.optimizer)
-        scaler.update() 
+        # scaler.step(optimizer.optimizer)
+        # scaler.update() 
         if len(device.gpu_list)>1:
             torch.cuda.synchronize() 
             torch.distributed.reduce(loss, dst=0)
