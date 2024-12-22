@@ -6,3 +6,4 @@ __pycache__
 data
 *.swp
 work_dir
+ctcdecode
